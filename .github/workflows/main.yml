@@ -1,0 +1,119 @@
+name: Build Revit Navisworks Exporter
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET Framework
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
+      
+    - name: Display .NET info
+      run: dotnet --info
+    
+    - name: Restore dependencies
+      run: dotnet restore RevitNavisworksExporter.csproj
+    
+    - name: Build project
+      run: dotnet build RevitNavisworksExporter.csproj -c Release --no-restore
+    
+    - name: List output files
+      run: dir bin\Release\net48\ /s
+      shell: cmd
+    
+    - name: Upload EXE artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: RevitNavisworksExporter-Windows
+        path: |
+          bin/Release/net48/*.exe
+          bin/Release/net48/*.dll
+          bin/Release/net48/*.config
+        retention-days: 90
+    
+    - name: Create Release Info
+      run: |
+        echo "Build completed successfully!" > build-info.txt
+        echo "Date: $(date)" >> build-info.txt
+        echo "Commit: ${{ github.sha }}" >> build-info.txt
+      shell: bash
+    
+    - name: Upload Build Info
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-info
+        path: build-info.txt
+```
+
+5. **Rename the file:**
+   - Change filename to: `.github/workflows/build.yml`
+   - GitHub will create the folder structure automatically
+
+6. **Click:** "Commit changes"
+   - Add message: "Add build workflow"
+   - Click "Commit changes"
+
+---
+
+### Step 5: Watch Your Build (2 minutes)
+
+1. **Automatically triggered!** The workflow starts immediately
+
+2. **Click:** "Actions" tab
+
+3. **You'll see:** A running job (yellow circle 🟡)
+
+4. **Click on it** to watch the build in real-time
+
+5. **Wait 2-3 minutes** for completion
+
+6. **Success!** Green checkmark ✅ appears
+
+---
+
+### Step 6: Download Your Compiled EXE (1 minute)
+
+1. **Scroll down** on the completed workflow page
+
+2. **Find:** "Artifacts" section
+
+3. **You'll see:**
+   - `RevitNavisworksExporter-Windows.zip`
+   - `build-info.txt`
+
+4. **Click** on `RevitNavisworksExporter-Windows.zip`
+
+5. **Save to your computer**
+
+6. **Extract the ZIP file:**
+   - Right-click → Extract All
+   - Inside you'll find: `RevitNavisworksExporter.exe`
+
+7. **Done!** 🎉
+
+---
+
+### Step 7: Test Your EXE (5 minutes)
+
+1. **Copy the EXE** to a test folder
+
+2. **Create a test folder structure:**
+```
+   C:\Test\
+     ├── RevitNavisworksExporter.exe
+     └── SampleProjects\
+         ├── Project1.rvt
+         └── Project2.rvt
