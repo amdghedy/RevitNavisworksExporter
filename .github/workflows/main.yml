@@ -56,7 +56,6 @@ jobs:
       with:
         name: build-info
         path: build-info.txt
-```
 
 5. **Rename the file:**
    - Change filename to: `.github/workflows/build.yml`
